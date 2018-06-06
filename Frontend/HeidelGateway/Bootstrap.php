@@ -847,13 +847,13 @@ class Shopware_Plugins_Frontend_HeidelGateway_Bootstrap extends Shopware_Compone
                         'label' => 'Minimum amount for easyCredit',
                         'value' => 200,
                         'scope' => \Shopware\Models\Config\Element::SCOPE_SHOP,
-                        'description' => 'set minimum amount for easyCredit'
+                        'description' => 'change minimum amount for easyCredit only after consultation with heidelpay'
                     ));
                     $form->setElement('text', 'HGW_EASYMAXAMOUNT', array(
                         'label' => 'Maximum amount for easyCredit',
-                        'value' => 5000,
+                        'value' => 3000,
                         'scope' => \Shopware\Models\Config\Element::SCOPE_SHOP,
-                        'description' => 'set maximum amount for easyCredit'
+                        'description' => 'change maximum amount for easyCredit only after consultation with heidelpay'
                     ));
                     $this->addSnippets();
                     $msg .= '* update 18.06.05 <br />';
@@ -1601,13 +1601,13 @@ class Shopware_Plugins_Frontend_HeidelGateway_Bootstrap extends Shopware_Compone
                 'label' => 'Minimum amount for easyCredit',
                 'value' => 200,
                 'scope' => \Shopware\Models\Config\Element::SCOPE_SHOP,
-                'description' => 'set minimum amount for easyCredit'
+                'description' => 'change maximum amount for easyCredit only after consultation with heidelpay'
             ));
             $form->setElement('text', 'HGW_EASYMAXAMOUNT', array(
                 'label' => 'Maximum amount for easyCredit',
-                'value' => 5000,
+                'value' => 3000,
                 'scope' => \Shopware\Models\Config\Element::SCOPE_SHOP,
-                'description' => 'set maximum amount for easyCredit'
+                'description' => 'change maximum amount for easyCredit only after consultation with heidelpay'
             ));
 			/* ************************************************** */
 
