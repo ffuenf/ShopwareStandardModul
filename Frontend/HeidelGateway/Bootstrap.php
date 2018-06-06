@@ -25,7 +25,7 @@ class Shopware_Plugins_Frontend_HeidelGateway_Bootstrap extends Shopware_Compone
 	 * @return string version number
 	 */
 	public function getVersion(){
-		return '18.05.24';
+		return '18.06.05';
 	}
 
 	/**
@@ -839,6 +839,28 @@ class Shopware_Plugins_Frontend_HeidelGateway_Bootstrap extends Shopware_Compone
                 } catch (Exception $e) {
                     $this->logError($msg, $e);
                 }
+
+            case '18.06.05':
+                // set minimum / maximum amount for easyCredit
+                try{
+                    $form->setElement('text', 'HGW_EASYMINAMOUNT', array(
+                        'label' => 'Minimum amount for easyCredit',
+                        'value' => 200,
+                        'scope' => \Shopware\Models\Config\Element::SCOPE_SHOP,
+                        'description' => 'set minimum amount for easyCredit'
+                    ));
+                    $form->setElement('text', 'HGW_EASYMAXAMOUNT', array(
+                        'label' => 'Maximum amount for easyCredit',
+                        'value' => 5000,
+                        'scope' => \Shopware\Models\Config\Element::SCOPE_SHOP,
+                        'description' => 'set maximum amount for easyCredit'
+                    ));
+                    $this->addSnippets();
+                    $msg .= '* update 18.06.05 <br />';
+                } catch (Exception $e) {
+                    $this->logError($msg, $e);
+                }
+
                 // overwrite $msg if update was successful
                 $msg = 'Update auf Version '.$this->getVersion().' erfolgreich.';
         }
@@ -1562,7 +1584,7 @@ class Shopware_Plugins_Frontend_HeidelGateway_Bootstrap extends Shopware_Compone
 			));
 			$form->setElement('select', 'HGW_IBAN', array(
 					'label' => 'Show IBAN?',
-					'value' => 2,
+					'value' => 1,
 					'store' => array(array(0, 'No'), array(1, 'Yes'), array(2, 'Both')),
 					'scope' => \Shopware\Models\Config\Element::SCOPE_SHOP,
 					'description' => 'Show IBAN or Account / Bank no.? Valid for Direct Debit and Sofort Banking.'
@@ -1574,6 +1596,21 @@ class Shopware_Plugins_Frontend_HeidelGateway_Bootstrap extends Shopware_Compone
 					'scope' => \Shopware\Models\Config\Element::SCOPE_SHOP,
 					'description' => 'Is the recognition disabled, the registered payment data will be discarded, if the customer changes the delivery address after the registration.'
 			));
+			/* ************************************************** */
+            $form->setElement('text', 'HGW_EASYMINAMOUNT', array(
+                'label' => 'Minimum amount for easyCredit',
+                'value' => 200,
+                'scope' => \Shopware\Models\Config\Element::SCOPE_SHOP,
+                'description' => 'set minimum amount for easyCredit'
+            ));
+            $form->setElement('text', 'HGW_EASYMAXAMOUNT', array(
+                'label' => 'Maximum amount for easyCredit',
+                'value' => 5000,
+                'scope' => \Shopware\Models\Config\Element::SCOPE_SHOP,
+                'description' => 'set maximum amount for easyCredit'
+            ));
+			/* ************************************************** */
+
 			$form->setElement('text', 'HGW_HPF_CC_CSS', array(
 					'label'=>'Path to hPF CSS for creditcard',
 					'value'=> '',
@@ -1810,12 +1847,20 @@ class Shopware_Plugins_Frontend_HeidelGateway_Bootstrap extends Shopware_Compone
                 $shipping	= Shopware()->Modules()->Admin()->sGetPremiumShippingcosts();
                 $shippingAmount = $shipping['value'];
 
-                if ($basketAmount+$shippingAmount >= 200 && $basketAmount+$shippingAmount <= 5000) {
+//                if ($basketAmount+$shippingAmount >= 200 && $basketAmount+$shippingAmount <= 5000) {
+                if (
+                    $basketAmount+$shippingAmount >= $config->HGW_EASYMINAMOUNT &&
+                    $basketAmount+$shippingAmount <= $config->HGW_EASYMAXAMOUNT
+                ) {
                     $view->activeEasy = "TRUE";
                     $view->easyAmount = $basketAmount+$shippingAmount;
+                    $view->HGW_EASYMINAMOUNT = $config->HGW_EASYMINAMOUNT;
+                    $view->HGW_EASYMAXAMOUNT = $config->HGW_EASYMAXAMOUNT;
                 } else {
                     $view->activeEasy = "FALSE";
                     $view->easyAmount = $basketAmount+$shippingAmount;
+                    $view->HGW_EASYMINAMOUNT = $config->HGW_EASYMINAMOUNT;
+                    $view->HGW_EASYMAXAMOUNT = $config->HGW_EASYMAXAMOUNT;
                 }
             }
 
@@ -2288,13 +2333,19 @@ class Shopware_Plugins_Frontend_HeidelGateway_Bootstrap extends Shopware_Compone
         $shipping	= Shopware()->Modules()->Admin()->sGetPremiumShippingcosts();
         $shippingAmount = $shipping['value'];
 
-        if ($basketAmount+$shippingAmount >= 200 && $basketAmount+$shippingAmount <= 5000)
-        {
+        if (
+            $basketAmount+$shippingAmount >= Shopware()->Plugins()->Frontend()->HeidelGateway()->Config()->HGW_EASYMINAMOUNT &&
+            $basketAmount+$shippingAmount <= Shopware()->Plugins()->Frontend()->HeidelGateway()->Config()->HGW_EASYMAXAMOUNT
+        ){
             $view->activeEasy = "TRUE";
             $view->easyAmount = $basketAmount+$shippingAmount;
+            $view->HGW_EASYMINAMOUNT = Shopware()->Plugins()->Frontend()->HeidelGateway()->Config()->HGW_EASYMINAMOUNT;
+            $view->HGW_EASYMAXAMOUNT = Shopware()->Plugins()->Frontend()->HeidelGateway()->Config()->HGW_EASYMAXAMOUNT;
         } else {
             $view->activeEasy = "FALSE";
             $view->easyAmount = $basketAmount+$shippingAmount;
+            $view->HGW_EASYMINAMOUNT = Shopware()->Plugins()->Frontend()->HeidelGateway()->Config()->HGW_EASYMINAMOUNT;
+            $view->HGW_EASYMAXAMOUNT = Shopware()->Plugins()->Frontend()->HeidelGateway()->Config()->HGW_EASYMAXAMOUNT;
         }
 
         // Function to show EasyCredit-text on choose-payment-site
@@ -2484,6 +2535,8 @@ class Shopware_Plugins_Frontend_HeidelGateway_Bootstrap extends Shopware_Compone
                         Shopware()->Session()->HPdidRequest = 'TRUE';
                         $view->activeEasy = "TRUE";
                         $view->easyAmount = $basketAmount+$shippingAmount;
+                        $view->HGW_EASYMINAMOUNT = Shopware()->Plugins()->Frontend()->HeidelGateway()->Config()->HGW_EASYMINAMOUNT;
+                        $view->HGW_EASYMAXAMOUNT = Shopware()->Plugins()->Frontend()->HeidelGateway()->Config()->HGW_EASYMAXAMOUNT;
 
                         if(Shopware()->Shop()->getTemplate()->getVersion() < 3){
                             $view->addTemplateDir(dirname(__FILE__) . '/Views/frontend/');
@@ -3435,7 +3488,7 @@ class Shopware_Plugins_Frontend_HeidelGateway_Bootstrap extends Shopware_Compone
                 'trans_desc' 	=> 'Heidelpay CD-Edition Hire purchase by easyCredit',
                 'additionalDescription' => '
 								<div class="EasyPermission">
-									<p>Der Finanzierungsbetrag liegt außerhalb der zulässigen Beträge (200 - 3.000 EUR). </p>
+									<p>Der Finanzierungsbetrag liegt außerhalb der zulässigen Beträge ('.Shopware()->Plugins()->Frontend()->HeidelGateway()->Config()->HGW_EASYMINAMOUNT.' - '.Shopware()->Plugins()->Frontend()->HeidelGateway()->Config()->HGW_EASYMAXAMOUNT.' EUR). </p>
 								</div>',
                 'template' 		=> 'hp_payment_hpr.tpl',
 
@@ -3634,8 +3687,8 @@ class Shopware_Plugins_Frontend_HeidelGateway_Bootstrap extends Shopware_Compone
 		$snippets[] = array('frontend/payment_heidelpay/error','en','HPError-800.100.171','Please choose another payment method');
 		$snippets[] = array('frontend/payment_heidelpay/error','de','HPError-800.300.101','Bitte w&auml;hlen Sie eine andere Zahlart');
 		$snippets[] = array('frontend/payment_heidelpay/error','en','HPError-800.300.101','Please choose another payment method');
-        $snippets[] = array('frontend/payment_heidelpay/error','de','HPError-800.100.174','Der Finanzierungsbetrag liegt au&szlig;erhalb der zulässigen Beträge (200 - 5000 EUR) ');
-        $snippets[] = array('frontend/payment_heidelpay/error','en','HPError-800.100.174','The financing amount is outside the permitted amounts of 200 and 5000 EUR');
+        $snippets[] = array('frontend/payment_heidelpay/error','de','HPError-800.100.174','Der Finanzierungsbetrag liegt au&szlig;erhalb der zulässigen Beträge ('.Shopware()->Plugins()->Frontend()->HeidelGateway()->Config()->HGW_EASYMINAMOUNT.' - '.Shopware()->Plugins()->Frontend()->HeidelGateway()->Config()->HGW_EASYMAXAMOUNT.' EUR) ');
+        $snippets[] = array('frontend/payment_heidelpay/error','en','HPError-800.100.174','The financing amount is outside the permitted amounts of '.Shopware()->Plugins()->Frontend()->HeidelGateway()->Config()->HGW_EASYMINAMOUNT.' and '.Shopware()->Plugins()->Frontend()->HeidelGateway()->Config()->HGW_EASYMAXAMOUNT.' EUR');
         $snippets[] = array('frontend/payment_heidelpay/error','de','HPError-800.400.153','Die verwendete Adresse wurde nicht gefunden');
         $snippets[] = array('frontend/payment_heidelpay/error','en','HPError-800.400.153','Sorry, your address could not be found');
         $snippets[] = array('frontend/payment_heidelpay/error','de','HPError-800.400.152','Die verwendete Adresse wurde nicht gefunden');
@@ -4372,7 +4425,16 @@ Mit freundlichen Gruessen
 							'HGW_HPF_DC_CSS' 		=> array(
 									'label'				=>'Pfad zum hPF CSS für Debitkarte',
 									'description' 		=> 'Bitte tragen Sie hier, beginnend mit "http(s)://", den absoluten Pfad zum CSS ein. Dieses CSS wird für das Debitkartenformular verwendet.'
-							)
+							),
+
+                            'HGW_EASYMINAMOUNT' 		=> array(
+                                    'label'				=>'Minimumbetrag für Ratenkauf by easyCredit',
+                                    'description' 		=> 'Bitte tragen Sie hier den mit heidelpay / easyCredit vereinbarten Minimumbetrag für Ihre Transaktionen ein.'
+                            ),
+                            'HGW_EASYMAXAMOUNT' 		=> array(
+                                    'label'				=>'Maximumbetrag für Ratenkauf by easyCredit',
+                                    'description' 		=> 'Bitte tragen Sie hier den mit heidelpay / easyCredit vereinbarten Maximumbetrag für Ihre Transaktionen ein.'
+                            )
 					),
 					'en_GB' => array(
 							'HGW_USER_PW' 			=> array('label' => 'Password'),
@@ -4458,7 +4520,16 @@ Mit freundlichen Gruessen
 							'HGW_HPF_DC_CSS' 		=> array(
 									'label'				=>'Path to hPF CSS for debitcard',
 									'description' 		=> 'Please enter the absolute path to the CSS, starting with "http(s)://". This CSS applies to our debitcard form.'
-							)
+							),
+
+                            'HGW_EASYMINAMOUNT' 		=> array(
+                                'label'				=>'Minimum amount for Ratenkauf by easyCredit',
+                                'description' 		=> 'Please enter here the appointed minimum amount for Ratenkauf by easyCredit.'
+                            ),
+                            'HGW_EASYMAXAMOUNT' 		=> array(
+                                'label'				=>'maximum amount for Ratenkauf by easyCredit',
+                                'description' 		=> 'Please enter here the appointed maximum amount for Ratenkauf by easyCredit.'
+                            )
 					),
 			);
 
