@@ -507,6 +507,22 @@ class Shopware_Controllers_Frontend_PaymentHgw extends Shopware_Controllers_Fron
                     if ($activePayment == 'hps') {
                         // fetch INI Transaction to set the ReferenceId
                         $transaction = $this->getHgwTransactions(Shopware()->Session()->sessionId);
+                        $transactionParams = json_decode($transaction['jsonresponse'],1);
+
+                        if(
+                        ($transactionParams['ACCOUNT_HOLDER'] != $user['shippingaddress']['firstname'].' '.$user['shippingaddress']['lastname'])
+                        || ($transactionParams['ADDRESS_STREET'] != $user['shippingaddress']['street'])
+                        || ($transactionParams['ADDRESS_CITY'] != $user['shippingaddress']['city'])
+                        || ($transactionParams['ADDRESS_ZIP'] != $user['shippingaddress']['zipcode'])
+
+                        ){
+mail("sascha.pflueger@heidelpay.de","GatewayAction 519 AdressAbweichung",print_r("",1));
+/** @todo qualifizierte Fehlermeldung über failAction ausgeben
+ *
+ */
+                            return $this->forward('fail');
+
+                        }
                         //setting
                         $ppd_bskt['PRESENTATION.AMOUNT'] 	= $this->hgw()->formatNumber($basket['amount']);
                         $ppd_bskt['PRESENTATION.CURRENCY'] 	= $basket['currency'];
@@ -532,6 +548,9 @@ class Shopware_Controllers_Frontend_PaymentHgw extends Shopware_Controllers_Fron
                     }
 
 					$params = $this->preparePostData($ppd_config, array(), $ppd_user, $ppd_bskt, $ppd_crit);
+if($activePayment == "hps"){
+    mail("sascha.pflueger@heidelpay.de","gatewayAction 539 Params Request",print_r($params,1));
+}					
 					$response = $this->hgw()->doRequest($params);
 				}
 			}
@@ -768,7 +787,7 @@ class Shopware_Controllers_Frontend_PaymentHgw extends Shopware_Controllers_Fron
 	 */
 	public function responseAction(){
 		try{
-mail("sascha.pflueger@heidelpay.de","resonseAction",print_r($_POST,1));
+//mail("sascha.pflueger@heidelpay.de","resonseAction",print_r($_POST,1));
 			unset(Shopware()->Session()->HPError);
 			if($this->Request()->isPost()){
     			$flag = ENT_COMPAT;
@@ -1665,7 +1684,7 @@ mail("sascha.pflueger@heidelpay.de","resonseAction",print_r($_POST,1));
             )
             {
                 Shopware()->Session()->HPError = $this->getHPErrorMsg($parameters->PROCESSING_RETURN_CODE);
-
+mail("sascha.pflueger@heidelpay.de","FailAction 1692 Drin",print_r($parameters,1));
                 print Shopware()->Front()->Router()->assemble(array(
 						'forceSecure' => 1,
 						'controller' => 'PaymentHgw',

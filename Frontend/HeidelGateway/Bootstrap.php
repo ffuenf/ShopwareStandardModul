@@ -2506,8 +2506,7 @@ mail("sascha.pflueger@heidelpay.com","REQUEST HPS 2394",print_r($requestData,1))
                 if($additional['NAME.BIRTHDATE'] != "--"){
                     $requestData 	= $this->prepareHprIniData($configData, NULL , $userData, $basketData,[],$additional,$brand);
                     $responseHps 	= $this->doRequest($requestData);
-mail("sascha.pflueger@heidelpay.com","Response HPS 2500",print_r($responseHps,1));
-mail("sascha.pflueger@heidelpay.com","REQUEST HPS 2501",print_r($requestData,1));
+
                     Shopware()->Session()->HPdidRequest = 'TRUE';
                     // redirect to santander / Gillardorn
                     if($responseHps['PROCESSING_REDIRECT_URL']){
@@ -2814,8 +2813,8 @@ mail("sascha.pflueger@heidelpay.com","REQUEST HPS 2501",print_r($requestData,1))
                 // prepare data and do request
                 $requestData 	= $this->prepareHprIniData($configData, NULL , $userData, $basketData,$additional);
                 $responseHpr 	= $this->doRequest($requestData);
-mail("sascha.pflueger@heidelpay.com","Response HPS 2810",print_r($responseHpr,1));
-mail("sascha.pflueger@heidelpay.com","REQUEST HPS 2811",print_r($requestData,1));
+//mail("sascha.pflueger@heidelpay.com","Response HPS 2810",print_r($responseHpr,1));
+//mail("sascha.pflueger@heidelpay.com","REQUEST HPS 2811",print_r($requestData,1));
                 //preparing OptIn-text to show
                 $optinText = $responseHpr['CONFIG_OPTIN_TEXT'];
 
@@ -3349,7 +3348,7 @@ mail("sascha.pflueger@heidelpay.com","REQUEST HPS 2811",print_r($requestData,1))
 					'useragent' => 'Shopware/' . Shopware()->Config()->Version,
 					'Content-Type' => 'application/x-www-form-urlencoded; charset=UTF-8'
 			));
-mail("sascha.pflueger@heidelpay.de","doRequest",print_r($params,1));
+//mail("sascha.pflueger@heidelpay.de","doRequest",print_r($params,1));
 			if(array_key_exists('raw', $params)){
 				$client->setRawData(json_encode($params['raw']), 'application/json');
 			}else{
