@@ -3,7 +3,6 @@
 
 {* Javascript *}
 {block name="frontend_index_header_javascript" append}
-
 	<script type="text/javascript">
 		$(document).ready(function($){
 			jQuery('#payment_frame').css('display', 'none');
@@ -30,6 +29,7 @@
 
 {* Main content *} 
 {block name="frontend_index_content"}
+
 {if $isMobile || $swfActive}<link rel="stylesheet" media="all" type="text/css" href="{$pluginPath}/Views/frontend/register/mobile.css">{/if}
 
 <div id="payment" class="grid_20">

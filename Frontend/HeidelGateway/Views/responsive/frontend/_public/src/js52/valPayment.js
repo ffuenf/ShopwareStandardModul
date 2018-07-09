@@ -310,8 +310,8 @@ $(document).ready(function(){
         // Event before swiching payment method
         $.ajaxSetup({
             beforeSend: function(event, xhr, settings){
+                // check chosen payment method
                 if(window.location.pathname.indexOf('shippingPayment') >= 0) {
-                    // check chosen payment method
                     var chosenPaymentMethod = $('input:radio:checked').attr('class');
 
                     if (chosenPaymentMethod != undefined) {
@@ -331,7 +331,6 @@ $(document).ready(function(){
                         $('#hgw_privpol_ivpd').removeAttr("required");
                     }
                 }
-
             },
             complete: function(event, xhr, settings){
                 if(window.location.pathname.indexOf('shippingPayment') >= 0) {
@@ -353,6 +352,7 @@ $(document).ready(function(){
                 }
             },
         });
+
 
     } else { // if SW-Version <= 5.2
 
@@ -623,6 +623,21 @@ $(document).ready(function(){
                 jQuery('#birthdate_ivpd').val(birthYear+'-'+birthMonth+'-'+birthDay);
             }
 
+            jQuery('.newreg_hps').change(function (e) {
+                var birthDay = jQuery(".newreg_hps [name='Date_Day']").val();
+                var birthMonth = jQuery(".newreg_hps [name = 'Date_Month']").val();
+                var birthYear = jQuery(".newreg_hps [name = 'Date_Year']").val();
+                jQuery('#birthdate_sanHps').val(birthYear + '-' + birthMonth + '-' + birthDay);
+            });
+
+            if (jQuery('.newreg_hps')) {
+                var birthDay = jQuery(".newreg_hps [name='Date_Day']").val();
+                var birthMonth = jQuery(".newreg_hps [name = 'Date_Month']").val();
+                var birthYear = jQuery(".newreg_hps [name = 'Date_Year']").val();
+
+                jQuery('#birthdate_sanHps').val(birthYear + '-' + birthMonth + '-' + birthDay);
+            }
+
             var chosenPaymentMethod = $('input:radio:checked').attr('class');
             if(chosenPaymentMethod != undefined) {
                 var cut = parseInt(chosenPaymentMethod.indexOf("hgw_")) + 4;
@@ -648,41 +663,43 @@ $(document).ready(function(){
         $.ajaxSetup({
             beforeSend: function(event, xhr, settings){
                 // check chosen payment method
-                var chosenPaymentMethod = $('input:radio:checked').attr('class');
+                if(window.location.pathname.indexOf('shippingPayment') >= 0) {
+                    var chosenPaymentMethod = $('input:radio:checked').attr('class');
 
-                if(chosenPaymentMethod != undefined){
-                    var cut = parseInt(chosenPaymentMethod.indexOf("hgw_"))+4;
-                    chosenPaymentMethod = chosenPaymentMethod.substr(cut,4);
+                    if (chosenPaymentMethod != undefined) {
+                        var cut = parseInt(chosenPaymentMethod.indexOf("hgw_")) + 4;
+                        chosenPaymentMethod = chosenPaymentMethod.substr(cut, 4);
 
-                    //setting Payolution-checkbox to required if payolution is chosen
-                    if(chosenPaymentMethod == 'ivpd'){
-                        $('#hgw_privpol_ivpd').attr("required","required");
-                        $('#hgw_privpol_ivpd').prop("required","required");
+                        //setting Payolution-checkbox to required if payolution is chosen
+                        if (chosenPaymentMethod == 'ivpd') {
+                            $('#hgw_privpol_ivpd').attr("required", "required");
+                            $('#hgw_privpol_ivpd').prop("required", "required");
+                        } else {
+                            $('#hgw_privpol_ivpd').prop("required", null);
+                            $('#hgw_privpol_ivpd').removeAttr("required");
+                        }
                     } else {
-                        $('#hgw_privpol_ivpd').prop("required",null);
+                        $('#hgw_privpol_ivpd').prop("required", null);
                         $('#hgw_privpol_ivpd').removeAttr("required");
                     }
-                } else {
-                    $('#hgw_privpol_ivpd').prop("required",null);
-                    $('#hgw_privpol_ivpd').removeAttr("required");
                 }
-
-
             },
             complete: function(event, xhr, settings){
-                var chosenPaymentMethod = $('input:radio:checked').attr('class');
-                // check chosen payment method
-                if(chosenPaymentMethod != undefined){
-                    var cut = parseInt(chosenPaymentMethod.indexOf("hgw_"))+4;
-                    chosenPaymentMethod = chosenPaymentMethod.substr(cut,4);
+                if(window.location.pathname.indexOf('shippingPayment') >= 0) {
+                    var chosenPaymentMethod = $('input:radio:checked').attr('class');
+                    // check chosen payment method
+                    if (chosenPaymentMethod != undefined) {
+                        var cut = parseInt(chosenPaymentMethod.indexOf("hgw_")) + 4;
+                        chosenPaymentMethod = chosenPaymentMethod.substr(cut, 4);
 
-                    //setting Payolution-checkbox to required if payolution is chosen
-                    if(chosenPaymentMethod == 'ivpd'){
-                        $('#hgw_privpol_ivpd').attr("required","required");
-                        $('#hgw_privpol_ivpd').prop("required","required");
-                    } else {
-                        $('#hgw_privpol_ivpd').prop("required",null);
-                        $('#hgw_privpol_ivpd').removeAttr("required");
+                        //setting Payolution-checkbox to required if payolution is chosen
+                        if (chosenPaymentMethod == 'ivpd') {
+                            $('#hgw_privpol_ivpd').attr("required", "required");
+                            $('#hgw_privpol_ivpd').prop("required", "required");
+                        } else {
+                            $('#hgw_privpol_ivpd').prop("required", null);
+                            $('#hgw_privpol_ivpd').removeAttr("required");
+                        }
                     }
                 }
             },
@@ -759,16 +776,17 @@ function valForm(){
                         });
                         if(pm == 'dd'){
                             var errors = valInputDdIban(jQuery('.newreg_'+pm+' #iban').val(), pm);
+                        }
 
-                            if (jQuery('.newreg_dd #salutation').is(':visible')) {
+                        if(pm == 'dd'){
+                            if (jQuery('#salutation').is(':visible')) {
                                 // getting Values from input fields
-                                var birthDay = jQuery('.newreg_dd select[name=Date_Day]').val();
-                                var birthMonth = jQuery('.newreg_dd select[name=Date_Month]').val();
-                                var birthYear = jQuery('.newreg_dd select[name=Date_Year]').val();
+                                var salutation = jQuery('#salutation').val();
+                                var birthDay = jQuery('select[name=Date_Day]').val();
+                                var birthMonth = jQuery('select[name=Date_Month]').val();
+                                var birthYear = jQuery('select[name=Date_Year]').val();
 
                                 jQuery('#birthdate_dd').val = birthYear+'-'+birthMonth+'-'+birthDay;
-
-                                errors = valDirectDebitSecured(errors);
                             }
                         }
 
@@ -849,23 +867,20 @@ function valGatewayForm(){
         }
     });
 
-    if(pm == 'dd'){
+    if((pm == 'dd') || (pm == 'sue')){
         var errors = valInputDdIban(jQuery('.'+checkedOpt+'  #iban').val(), pm);
-
-        if (jQuery('#salutation').is(':visible')) {
-            // getting Values from input fields
-            var salutation = jQuery('#salutation').val();
-            var birthDay = jQuery('select[name=Date_Day]').val();
-            var birthMonth = jQuery('select[name=Date_Month]').val();
-            var birthYear = jQuery('select[name=Date_Year]').val();
-
-            jQuery('#birthdate_dd').val(birthYear+'-'+birthMonth+'-'+birthDay);
-            errors = valDirectDebitSecured(errors);
-        }
     }else if(pm == 'gir'){
         var errors = valInputDdIban(jQuery('.'+checkedOpt+'  #iban').val(), pm);
     }
+    if (pm == 'dd' && jQuery('#salutation').is(':visible')) {
+        // getting Values from input fields
+        var salutation = jQuery('#salutation').val();
+        var birthDay = jQuery('select[name=Date_Day]').val();
+        var birthMonth = jQuery('select[name=Date_Month]').val();
+        var birthYear = jQuery('select[name=Date_Year]').val();
 
+        jQuery('#birthdate_dd').val(birthYear+'-'+birthMonth+'-'+birthDay);
+    }
 
     if(pm == "papg"){
         var errorsPapg = valInvoiceSec();
@@ -924,8 +939,6 @@ function valShippingPaymentForm(){
 
             if(pm == 'dd'){
                 var errors = valInputDdIban(jQuery('.newreg_'+pm+' #iban').val(), pm);
-
-                errors = valDirectDebitSecured(errors);
             }
             if(pm == 'papg'){
                 var dob = new Date(jQuery('.hgw_papg select[name="Date_Year"]').val(), jQuery('.hgw_papg select[name="Date_Month"]').val()-1, jQuery('.hgw_papg select[name="Date_Day"]').val());
@@ -1217,54 +1230,4 @@ function valInvoiceSec() {
     if(errors.length > 0){
         return errors;
     }
-}
-
-function valDirectDebitSecured(errors) {
-    var i = 1;
-    // validation of salutation
-    var salutation = $('.newreg_dd #salutation').val();
-    if(salutation == undefined || salutation == "UNKNOWN")
-    {
-        $('.newreg_dd #salutation').parent('.js--fancy-select').addClass("has--error");
-        errors[i++] = '.msg_salut';
-    } else {
-        $('.newreg_dd #salutation').parent('.js--fancy-select').removeClass('has--error');
-    }
-
-    //validation of birthdate
-    var birthdate = $('#birthdate_dd').val();
-    if(birthdate.match(/[0-9]{4}[-][0-9]{2}[-][0-9]{2}/))
-    {
-        var dob = new Date(jQuery('.newreg_dd select[name="Date_Year"]').val(), jQuery('.newreg_dd select[name="Date_Month"]').val()-1, jQuery('.newreg_dd select[name="Date_Day"]').val());
-        var today = new Date();
-        var age = Math.floor((today-dob) / (365.25 * 24 * 60 * 60 * 1000));
-        if(age < 18){
-
-            jQuery('.newreg_dd select[name="Date_Year"]').parent('.js--fancy-select').addClass('has--error');
-            jQuery('.newreg_dd select[name="Date_Year"]').addClass('has--error');
-            jQuery('.newreg_dd select[name="Date_Month"]').parent('.js--fancy-select').addClass('has--error');
-            jQuery('.newreg_dd select[name="Date_Month"]').addClass('has--error');
-            jQuery('.newreg_dd select[name="Date_Day"]').parent('.js--fancy-select').addClass('has--error');
-            jQuery('.newreg_dd select[name="Date_Day"]').addClass('has--error');
-
-            errors[i++] = '.msg_dob';
-        }else{
-            jQuery('.newreg_dd select[name="Date_Year"]').parent('.js--fancy-select').removeClass('has--error');
-            jQuery('.newreg_dd select[name="Date_Year"]').removeClass('has--error');
-            jQuery('.newreg_dd select[name="Date_Month"]').parent('.js--fancy-select').removeClass('has--error');
-            jQuery('.newreg_dd select[name="Date_Month"]').removeClass('has--error');
-            jQuery('.newreg_dd select[name="Date_Day"]').parent('.js--fancy-select').removeClass('has--error');
-            jQuery('.newreg_dd select[name="Date_Day"]').removeClass('has--error');
-        }
-    } else {
-        //birthdate doesn't fit to formate YYYY-MM-DD
-        jQuery('.newreg_dd select[name="Date_Year"]').parent('.js--fancy-select').addClass('has--error');
-        jQuery('.newreg_dd select[name="Date_Year"]').addClass('has--error');
-        jQuery('.newreg_dd select[name="Date_Month"]').parent('.js--fancy-select').addClass('has--error');
-        jQuery('.newreg_dd select[name="Date_Month"]').addClass('has--error');
-        jQuery('.newreg_dd select[name="Date_Day"]').parent('.js--fancy-select').addClass('has--error');
-        jQuery('.newreg_dd select[name="Date_Day"]').addClass('has--error');
-        errors[i++] = '.msg_dob';
-    }
-    return errors;
 }
