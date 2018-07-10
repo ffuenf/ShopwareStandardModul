@@ -516,10 +516,8 @@ class Shopware_Controllers_Frontend_PaymentHgw extends Shopware_Controllers_Fron
                         || ($transactionParams['ADDRESS_ZIP'] != $user['shippingaddress']['zipcode'])
 
                         ){
-mail("sascha.pflueger@heidelpay.de","GatewayAction 519 AdressAbweichung",print_r("",1));
-/** @todo qualifizierte Fehlermeldung über failAction ausgeben
- *
- */
+                            Shopware()->Session()->HPOrderID = $transaction['transactionid'];
+                            Shopware()->Session()->HpHpsErrorAdress = true;
                             return $this->forward('fail');
 
                         }
@@ -531,7 +529,6 @@ mail("sascha.pflueger@heidelpay.de","GatewayAction 519 AdressAbweichung",print_r
 
                         $ppd_crit['IDENTIFICATION.REFERENCEID'] = $transaction['uniqueid'];
                         unset($this->View()->linkPrecontactInfos);
-
                     }
 
                     if($activePayment == 'bs'){
@@ -548,10 +545,7 @@ mail("sascha.pflueger@heidelpay.de","GatewayAction 519 AdressAbweichung",print_r
                     }
 
 					$params = $this->preparePostData($ppd_config, array(), $ppd_user, $ppd_bskt, $ppd_crit);
-if($activePayment == "hps"){
-    mail("sascha.pflueger@heidelpay.de","gatewayAction 539 Params Request",print_r($params,1));
-}					
-					$response = $this->hgw()->doRequest($params);
+    				$response = $this->hgw()->doRequest($params);
 				}
 			}
 
@@ -787,7 +781,6 @@ if($activePayment == "hps"){
 	 */
 	public function responseAction(){
 		try{
-//mail("sascha.pflueger@heidelpay.de","resonseAction",print_r($_POST,1));
 			unset(Shopware()->Session()->HPError);
 			if($this->Request()->isPost()){
     			$flag = ENT_COMPAT;
@@ -1665,7 +1658,7 @@ if($activePayment == "hps"){
 	 */
 	public function failAction(){
 		try{
-            if (empty(Shopware()->Session()->HPOrderID)) {
+		    if (empty(Shopware()->Session()->HPOrderID)) {
                 $transaction = $this->getHgwTransactions(Shopware()->Session()->sessionId);
                 $parameters = json_decode($transaction['jsonresponse']);
             } else {
@@ -1675,7 +1668,6 @@ if($activePayment == "hps"){
 
 			$payType = $transaction['payment_method'];
 			$transType = $transaction['payment_type'];
-
 			// cancelation MPA, HP
             if (
                 $parameters->CRITERION_GATEWAY == '1' ||
@@ -1684,7 +1676,12 @@ if($activePayment == "hps"){
             )
             {
                 Shopware()->Session()->HPError = $this->getHPErrorMsg($parameters->PROCESSING_RETURN_CODE);
-mail("sascha.pflueger@heidelpay.de","FailAction 1692 Drin",print_r($parameters,1));
+
+                if(Shopware()->Session()->HpHpsErrorAdress){
+                    Shopware()->Session()->HPError = $this->getHPErrorMsg("700.400.XXX",false);
+                    Shopware()->Session()->HpHpsErrorAdress = false;
+                }
+
                 print Shopware()->Front()->Router()->assemble(array(
 						'forceSecure' => 1,
 						'controller' => 'PaymentHgw',

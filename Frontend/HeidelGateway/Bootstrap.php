@@ -25,7 +25,7 @@ class Shopware_Plugins_Frontend_HeidelGateway_Bootstrap extends Shopware_Compone
 	 * @return string version number
 	 */
 	public function getVersion(){
-		return '18.07.08';
+		return '18.07.09';
 	}
 
 	/**
@@ -872,10 +872,12 @@ class Shopware_Plugins_Frontend_HeidelGateway_Bootstrap extends Shopware_Compone
                     $this->logError($msg, $e);
                 }
 
-            case '18.07.08':
+            case '18.07.09':
                 // changes in paymentmethod "Santander Ratenkauf"
+                // added a new error message for differing delivery address
                 try{
-                    $msg .= '* update 18.07.08 <br />';
+                    $this->addSnippets();
+                    $msg .= '* update 18.07.09 <br />';
                 } catch (Exception $e) {
                     $this->logError($msg, $e);
                 }
@@ -2398,8 +2400,7 @@ class Shopware_Plugins_Frontend_HeidelGateway_Bootstrap extends Shopware_Compone
             if(strtolower($user['additional']['payment']['name']) == 'hgw_hpr'){
                 $requestData 	= $this->prepareHprIniData($configData, NULL , $userData, $basketData,[],$additional,$brand);
                 $responseHpr 	= $this->doRequest($requestData);
-mail("sascha.pflueger@heidelpay.com","Response HPS 2393",print_r($responseHpr,1));
-mail("sascha.pflueger@heidelpay.com","REQUEST HPS 2394",print_r($requestData,1));
+
                 //preparing OptIn-text to show
                 $optinText = $responseHpr['CONFIG_OPTIN_TEXT'];
 
@@ -2813,8 +2814,7 @@ mail("sascha.pflueger@heidelpay.com","REQUEST HPS 2394",print_r($requestData,1))
                 // prepare data and do request
                 $requestData 	= $this->prepareHprIniData($configData, NULL , $userData, $basketData,$additional);
                 $responseHpr 	= $this->doRequest($requestData);
-//mail("sascha.pflueger@heidelpay.com","Response HPS 2810",print_r($responseHpr,1));
-//mail("sascha.pflueger@heidelpay.com","REQUEST HPS 2811",print_r($requestData,1));
+
                 //preparing OptIn-text to show
                 $optinText = $responseHpr['CONFIG_OPTIN_TEXT'];
 
@@ -3348,7 +3348,7 @@ mail("sascha.pflueger@heidelpay.com","REQUEST HPS 2394",print_r($requestData,1))
 					'useragent' => 'Shopware/' . Shopware()->Config()->Version,
 					'Content-Type' => 'application/x-www-form-urlencoded; charset=UTF-8'
 			));
-//mail("sascha.pflueger@heidelpay.de","doRequest",print_r($params,1));
+
 			if(array_key_exists('raw', $params)){
 				$client->setRawData(json_encode($params['raw']), 'application/json');
 			}else{
@@ -3834,6 +3834,8 @@ mail("sascha.pflueger@heidelpay.com","REQUEST HPS 2394",print_r($requestData,1))
         $snippets[] = array('frontend/payment_heidelpay/error','en','HPError-700.400.802','Activation deadline is in the past');
         $snippets[] = array('frontend/payment_heidelpay/error','de','HPError-700.400.804','Transaktion wurde zum Versicherer bereits &uuml;bermittelt');
         $snippets[] = array('frontend/payment_heidelpay/error','en','HPError-700.400.804','Transaction already submitted to insurance provider');
+        $snippets[] = array('frontend/payment_heidelpay/error','de','HPError-700.400.XXX','Ihre Lieferadresse stimmt nicht mit der bei der Santander vorliegenden Daten überein');
+        $snippets[] = array('frontend/payment_heidelpay/error','en','HPError-700.400.XXX','Your delivery address differs from your prior given address');
         // Ende Santander Codes
 
         $snippets[] = array('frontend/payment_heidelpay/error','de','HPError-800.100.151','Bitte w&auml;hlen Sie eine andere Zahlart');
