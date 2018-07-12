@@ -128,123 +128,7 @@ jQuery('form.payment').attr('onSubmit', 'return valShippingPaymentForm();');
                     changeUrl(checkedOpt, orgLink);
                 });
             }
-/* *************************** Ende Code *************************** */
 
-//             if (
-//                 (window.location.pathname.toLowerCase().indexOf('shippingpayment') == '-1')
-//                 ||(window.location.pathname.toLowerCase().indexOf('zahlungsart-und-versand') == '-1')
-//                 ) {
-//                 // change checked option
-//                 jQuery('.register--payment').click(function () {
-//                     // change form action
-//                     var checkedOpt = jQuery('.register--payment input:radio:checked').attr('class');
-//                     changeUrl(checkedOpt, orgLink);
-//                 });
-//                 jQuery('.hgw_dd').click(function () {
-//                     // change form action
-//                     var checkedOpt = "hgw_dd";
-//                     changeUrl(checkedOpt, orgLink);
-//                 });
-// console.log("34");
-//             } else {
-//                 var clicked = '';
-//                 $(this).click(function (e) {
-//                     clicked = e.target.className;
-//                 });
-//                 jQuery('.payment--method-list').click(function () {
-//                     // change form action
-//                     var checkedOpt = jQuery('.payment--method input:radio:checked').attr('class');
-//                     changeUrl(checkedOpt, orgLink);
-//
-//                 });
-// console.log("46");
-//                 // set original form action (before AJAX is sent)
-//                 $.ajaxSetup({
-//                     beforeSend: function (event, xhr, settings) {
-//                         // check for right ajax request
-//                         if (xhr.data != undefined) {
-//                             // just execute if hgw pay. method is selected
-//                             if (clicked.indexOf('hgw_') != -1) {
-//                                 xhr.data += '&hgw=1';
-//
-//                                 if (this.url != orgLink) {
-//                                     this.url = orgLink;
-//                                     jQuery('form.payment').attr('action', orgLink);
-//                                 }
-//                             }
-//                         }
-//                     },
-//                 });
-//
-//
-//                 $(document).ajaxComplete(function (event, xhr, settings) {
-//                     // function set birthdate for santander
-//                     if(jQuery('.newreg_san').is(":visible")) {
-//                         $(".hgw_required").attr("required","required");
-//                         var birthDay = jQuery(".newreg_san [name='Date_Day']").val();
-//                         var birthMonth = jQuery(".newreg_san [name = 'Date_Month']").val();
-//                         var birthYear = jQuery(".newreg_san [name = 'Date_Year']").val();
-//
-//                         jQuery('#birthdate_san').val(birthYear+'-'+birthMonth+'-'+birthDay);
-//                     } else {
-//                         $(".hgw_required").removeAttr("required");
-//                     }
-// console.log("78");
-//                     if(jQuery('.newreg_dd').is(":visible") && jQuery(".newreg_dd [name='Date_Day']").is(":visible")) {
-//                         var birthDay = jQuery(".newreg_dd [name='Date_Day']").val();
-//                         var birthMonth = jQuery(".newreg_dd [name = 'Date_Month']").val();
-//                         var birthYear = jQuery(".newreg_dd [name = 'Date_Year']").val();
-//
-//                         jQuery('#birthdate_dd').val(birthYear+'-'+birthMonth+'-'+birthDay);
-//                     }
-//
-//                     if (((settings.data != undefined) && (settings.data.indexOf('hgw=1') != -1)) || ($('.payment--method-list input:radio:checked').attr('class').indexOf('hgw_') != -1)) {
-//                         // load fancy-js for select boxes
-//                         if (swVersion >= '5.1') {
-//                             jQuery('select:not([data-no-fancy-select="true"])').swSelectboxReplacement();
-//                         } else {
-//                             jQuery('select:not([data-no-fancy-select="true"])').selectboxReplacement();
-//                         }
-//
-//
-//
-//                         // set width for XS-State (with SW-Statemanger)
-//                         StateManager.registerListener({
-//                             state: 'xs',
-//                             enter: function () {
-//                                 jQuery('.js--fancy-select').attr('style', 'width:100%;');
-//                             },
-//                             exit: function () {
-//                                 jQuery('.js--fancy-select').removeAttr('style');
-//                             }
-//                         });
-//                         // add validation for form
-//                         jQuery('form.payment').attr('onSubmit', 'return valShippingPaymentForm();');
-//
-//                         // just call changeUrl() after all animations are done
-//                         $(document).promise().done(function () {
-//                             document.asyncReady(function () {
-//                                 // $(document).reuse();
-//                                 // $(document).ibanCheck();
-//                                 var checkedOpt = jQuery('.payment--method-list input:radio:checked').attr('class');
-//                                 $('input[class*="reues"]:checkbox, input[name*="ACCOUNT"], select[name*="ACCOUNT"], input[name*="CONTACT"]').click(function () {
-//                                     // change form action
-//                                     changeUrl(checkedOpt, orgLink);
-//                                 });
-//                                 if (checkedOpt.indexOf('papg') != '-1') {
-//                                     // change form action
-//                                     changeUrl(checkedOpt, orgLink);
-//                                 }
-//
-//                                 if (checkedOpt.indexOf('san') != '-1') {
-//                                     // change form action
-//                                     changeUrl(checkedOpt, orgLink);
-//                                 }
-//                             });
-//                         });
-//                     }
-//                 });
-//             }
             // case to set or remove required attribute for payolution checkbox
             var paymentMethod = $('input:radio:checked').attr('class');
             if(paymentMethod != undefined) {
@@ -843,41 +727,15 @@ function valShippingPaymentForm() {
 
                 case "hps":
                     var errors = valSantanderHP();
-                    if(errors.length >0){return false;}
+                    // if(errors.length >0){return false;}
             }
-            // if (pm == 'dd') {
-            //     var errors = valInputDdIban(jQuery('.newreg_' + pm + ' #iban').val(), pm);
-            // }
-            //
-            // if (pm == 'papg') {
-            //     var dob = new Date(jQuery('.hgw_papg select[name="Date_Year"]').val(), jQuery('.hgw_papg select[name="Date_Month"]').val() - 1, jQuery('.hgw_papg select[name="Date_Day"]').val());
-            //     var today = new Date();
-            //     var age = Math.floor((today - dob) / (365.25 * 24 * 60 * 60 * 1000));
-            //     var errors = valBirthdate(age);
-            // }
-
-            // if(pm == 'san'){
-            //     var errors = valSantander();
-            //
-            //     if(errors.length >0)
-            //     {
-            //         return false;
-            //     }
-            // }
-
-            // if(pm == 'ivpd'){
-            //     var errors = valPayolutionDirect();
-            //     if(errors.length >0)
-            //     {
-            //         return false;
-            //     }
-            // }
-
-
-
         }
 
-        if ((jQuery('div.hgw_' + pm + ' .has--error').length > 0)) {
+        if (
+            (jQuery('div.hgw_' + pm + ' .has--error').length > 0)
+            || (jQuery('div.newreg_' + pm + ' .has--error').length > 0)
+
+        ) {
             if (jQuery('.content-main--inner .content .alert--content ul').length == 0) {
                 jQuery('.content-main--inner .content .alert--content').html('<ul class="alert--list"></ul>');
             }
