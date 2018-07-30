@@ -1224,10 +1224,10 @@ class Shopware_Controllers_Frontend_PaymentHgw extends Shopware_Controllers_Fron
             $resp['PROCESSING_STATUS']			= $this->Request()->getPost('PROCESSING_STATUS') == true ? htmlspecialchars($this->Request()->getPost('PROCESSING_STATUS'), $flag, $enc) : '';
 
             // special criterions for HPR
-            $resp['CRITERION_EASYCREDIT_FIRSTRATEDUEDATE']	= $this->Request()->getPost('CRITERION_EASYCREDIT_FIRSTRATEDUEDATE') 	== true ? htmlspecialchars($this->Request()->getPost('CRITERION_EASYCREDIT_FIRSTRATEDUEDATE'), $flag, $enc) : '';
-            $resp['CRITERION_EASYCREDIT_AMORTISATIONTEXTT']	= $this->Request()->getPost('CRITERION_EASYCREDIT_AMORTISATIONTEXT') 	== true ? htmlspecialchars($this->Request()->getPost('CRITERION_EASYCREDIT_AMORTISATIONTEXT'), $flag, $enc) : '';
-            $resp['CRITERION_EASYCREDIT_TOTALRUNTIME']		= $this->Request()->getPost('CRITERION_EASYCREDIT_TOTALRUNTIME') 		== true ? htmlspecialchars($this->Request()->getPost('CRITERION_EASYCREDIT_TOTALRUNTIME'), $flag, $enc) : '';
-            $resp['CONFIG_OPTIN_EASYCREDIT']				= $this->Request()->getPost('CONFIG_OPTIN_TEXT') 					== true ? htmlspecialchars($this->Request()->getPost('CONFIG_OPTIN_TEXT'), $flag, $enc) : '';
+            $resp['CRITERION_EASYCREDIT_FIRSTRATEDUEDATE']	= $this->Request()->getPost('CRITERION_EASYCREDIT_FIRSTRATEDUEDATE') 	== true     ? htmlspecialchars($this->Request()->getPost('CRITERION_EASYCREDIT_FIRSTRATEDUEDATE'), $flag, $enc) : '';
+            $resp['CRITERION_EASYCREDIT_AMORTISATIONTEXTT'] = $this->Request()->getPost('CRITERION_EASYCREDIT_AMORTISATIONTEXT') 	== true ? htmlspecialchars($this->Request()->getPost('CRITERION_EASYCREDIT_AMORTISATIONTEXT'), $flag, $enc) : '';
+            $resp['CRITERION_EASYCREDIT_TOTALRUNTIME']		= $this->Request()->getPost('CRITERION_EASYCREDIT_TOTALRUNTIME') == true          ? htmlspecialchars($this->Request()->getPost('CRITERION_EASYCREDIT_TOTALRUNTIME'), $flag, $enc) : '';
+            $resp['CONFIG_OPTIN_EASYCREDIT']				= $this->Request()->getPost('CONFIG_OPTIN_TEXT') == true                        ? htmlspecialchars($this->Request()->getPost('CONFIG_OPTIN_TEXT'), $flag, $enc) : '';
 
             $resp['CRITERION_EASYCREDIT_MONTHLYRATECOUNT']	= $this->Request()->getPost('CRITERION_EASYCREDIT_MONTHLYRATECOUNT') 	== true ? htmlspecialchars($this->Request()->getPost('CRITERION_EASYCREDIT_MONTHLYRATECOUNT'), $flag, $enc) : '';
             $resp['CRITERION_EASYCREDIT_PRECONTRACTINFORMATIONURL']	= $this->Request()->getPost('CRITERION_EASYCREDIT_PRECONTRACTINFORMATIONURL') 	== true ? htmlspecialchars($this->Request()->getPost('CRITERION_EASYCREDIT_PRECONTRACTINFORMATIONURL'), $flag, $enc) : '';
@@ -1246,14 +1246,15 @@ class Shopware_Controllers_Frontend_PaymentHgw extends Shopware_Controllers_Fron
             $resp['RISKINFORMATION.CUSTOMERSINCE']			= $this->Request()->getPost('RISKINFORMATION.CUSTOMERSINCE') 			== true ? htmlspecialchars($this->Request()->getPost('RISKINFORMATION.CUSTOMERSINCE'), $flag, $enc) : '';
             $resp['RISKINFORMATION.CUSTOMERORDERCOUNT']		= $this->Request()->getPost('RISKINFORMATION.CUSTOMERORDERCOUNT') 		== true ? htmlspecialchars($this->Request()->getPost('RISKINFORMATION.CUSTOMERORDERCOUNT'), $flag, $enc) : '';
 
-            $resp['CRITERION_SHOP_ID']			= $this->Request()->getPost('CRITERION_SHOP_ID') == true ? htmlspecialchars($this->Request()->getPost('CRITERION_SHOP_ID'), $flag, $enc) : '';
-            $resp['CRITERION_SECRET']			= $this->Request()->getPost('CRITERION_SECRET') == true ? htmlspecialchars($this->Request()->getPost('CRITERION_SECRET'), $flag, $enc) : '';
-            $resp['CRITERION_SESS']				= $this->Request()->getPost('CRITERION_SESS') == true ? htmlspecialchars($this->Request()->getPost('CRITERION_SESS'), $flag, $enc) : '';
+            $resp['CRITERION_SHOP_ID']			    = $this->Request()->getPost('CRITERION_SHOP_ID') == true ? htmlspecialchars($this->Request()->getPost('CRITERION_SHOP_ID'), $flag, $enc) : '';
+            $resp['CRITERION_SECRET']			    = $this->Request()->getPost('CRITERION_SECRET') == true ? htmlspecialchars($this->Request()->getPost('CRITERION_SECRET'), $flag, $enc) : '';
+            $resp['CRITERION_SESS']				    = $this->Request()->getPost('CRITERION_SESS') == true ? htmlspecialchars($this->Request()->getPost('CRITERION_SESS'), $flag, $enc) : '';
             $resp['CRITERION_PUSH_URL']			= $this->Request()->getPost('CRITERION_PUSH_URL') == true ? htmlspecialchars($this->Request()->getPost('CRITERION_PUSH_URL'), $flag, $enc) : '';
-            $resp['CRITERION_SHOP_TYPE']		= $this->Request()->getPost('CRITERION_SHOP_TYPE') == true ? htmlspecialchars($this->Request()->getPost('CRITERION_SHOP_TYPE'), $flag, $enc) : '';
-            $resp['SHOP_TYPE']					= $this->Request()->getPost('SHOP_TYPE') == true ? htmlspecialchars($this->Request()->getPost('SHOP_TYPE'), $flag, $enc) : '';
-            $resp['SHOPMODULE_VERSION']			= $this->Request()->getPost('SHOPMODULE_VERSION') == true ? htmlspecialchars($this->Request()->getPost('SHOPMODULE_VERSION'), $flag, $enc) : '';
-            $resp['CRITERION_MODULE_VERSION']	= $this->Request()->getPost('CRITERION_MODULE_VERSION') == true ? htmlspecialchars($this->Request()->getPost('CRITERION_MODULE_VERSION'), $flag, $enc) : '';
+            $resp['CRITERION_SHOP_TYPE']		    = $this->Request()->getPost('CRITERION_SHOP_TYPE') == true ? htmlspecialchars($this->Request()->getPost('CRITERION_SHOP_TYPE'), $flag, $enc) : '';
+            $resp['SHOP_TYPE']					    = $this->Request()->getPost('SHOP_TYPE') == true ? htmlspecialchars($this->Request()->getPost('SHOP_TYPE'), $flag, $enc) : '';
+            $resp['SHOPMODULE_VERSION']		    = $this->Request()->getPost('SHOPMODULE_VERSION') == true ? htmlspecialchars($this->Request()->getPost('SHOPMODULE_VERSION'), $flag, $enc) : '';
+            $resp['CRITERION_MODULE_VERSION']	    = $this->Request()->getPost('CRITERION_MODULE_VERSION') == true ? htmlspecialchars($this->Request()->getPost('CRITERION_MODULE_VERSION'), $flag, $enc) : '';
+            $resp['CRITERION_CONFIG_OPTINFIELD']   = $this->Request()->getPost('CRITERION_CONFIG_OPTINFIELD') == true ? htmlspecialchars($this->Request()->getPost('CRITERION_CONFIG_OPTINFIELD'), $flag, $enc) : '';
 
             $resp['PAYMENT_CODE']				= $this->Request()->getPost('PAYMENT_CODE') == true ? htmlspecialchars($this->Request()->getPost('PAYMENT_CODE'), $flag, $enc) : '';
 
@@ -1331,6 +1332,7 @@ class Shopware_Controllers_Frontend_PaymentHgw extends Shopware_Controllers_Fron
             Shopware()->Session()->sessionId = $resp['CRITERION_SESS'];
 
             if ($resp['PROCESSING_RESULT'] == 'ACK') {
+//mail("sascha.pflueger@heidelpay.de","ResponseHprAction 1335",print_r($resp,1));
                 switch ($resp['PAYMENT_CODE'] == 'HP.IN') {
                     case 'HP.IN':
                         //save result to hgw_transactions
@@ -3699,13 +3701,13 @@ class Shopware_Controllers_Frontend_PaymentHgw extends Shopware_Controllers_Fron
      */
     public function afterEasyAction()
     {
-        Shopware()->Session()->HPdidRequest = 'TRUE';
-        $this->redirect(
-            array(
-                'controller' => 'checkout',
-                'action' => 'confirm',
-            )
-        );
+        Shopware()->Session()->HPdidRequest = "TRUE";
+mail("sascha.pflueger@heidelpay.de","AfterEasyAction session",print_r($_SESSION,1));
+        return $this->redirect(array(
+            'forceSecure' => 1,
+            'controller' => 'checkout',
+            'action' => 'confirm'
+        ));
     }
 
     public function convertOrder($transactionData)

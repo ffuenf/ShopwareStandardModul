@@ -12,7 +12,8 @@
 					<p>Datenübermittlung Ratenkauf by easyCredit</p>
 				</div>
 				<div>
-					<input type="checkbox" id="hgw_cb_hpr" name="CONFIG.OPTIN.TEXT" value="TRUE" class="checkbox" required="required">*
+					{*<input type="checkbox" id="hgw_cb_hpr" name="CONFIG.OPTIN.TEXT" value="TRUE" class="checkbox" required="required">**}
+					<input type="checkbox" id="hgw_cb_hpr" name="CRITERION_CONFIG_OPTINFIELD" value="TRUE" class="checkbox" required="required">*
 					<span>{$configOptInText}</span>
 				</div>
 			{/if}

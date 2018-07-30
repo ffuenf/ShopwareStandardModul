@@ -2402,8 +2402,12 @@ class Shopware_Plugins_Frontend_HeidelGateway_Bootstrap extends Shopware_Compone
         // Function to show EasyCredit-text on choose-payment-site
         if (
             ($request->getControllerName() == 'checkout') &&
-            (strtolower($user['additional']['payment']['name']) == 'hgw_hpr') &&
-            ((Shopware()->Session()->HPdidRequest == 'FALSE') || (empty(Shopware()->Session()->HPdidRequest)) )
+            (strtolower($user['additional']['payment']['name']) == 'hgw_hpr')
+            && (
+                (Shopware()->Session()->HPdidRequest == 'FALSE') ||
+                (empty(Shopware()->Session()->HPdidRequest)) ||
+                ($request->getPost('CRITERION_CONFIG_OPTINFIELD') != 'TRUE')
+            )
         )
         {
             // collect paymentdata for HP.IN
@@ -2430,6 +2434,7 @@ class Shopware_Plugins_Frontend_HeidelGateway_Bootstrap extends Shopware_Compone
                 'RISKINFORMATION.CUSTOMERGUESTCHECKOUT' => $user['additional']['user']['accountmode'] == '0' ?  'FALSE':'TRUE',
                 'RISKINFORMATION.CUSTOMERSINCE' 		=> $user['additional']['user']['firstlogin'],
                 'RISKINFORMATION.CUSTOMERORDERCOUNT' 	=> $countOrderForCustomer['COUNT(id)'],
+                'CRITERION.CONFIG_OPTINFIELD' 	        => $request->getPost('CRITERION_CONFIG_OPTINFIELD'),
 
             );
 
@@ -2457,85 +2462,183 @@ class Shopware_Plugins_Frontend_HeidelGateway_Bootstrap extends Shopware_Compone
             $view->extendsTemplate('register/hp_payment_hpr.tpl');
         }
 
-        if (
+//        if (
+//            ($request->getControllerName() == 'checkout') &&
+//            ($request->getActionName() == 'shippingPayment') &&
+//            (strtolower($user['additional']['payment']['name']) == 'hgw_ivpd')
+//        )
+//        {
+//        }
+//mail("sascha.pflueger@heidelpay.de","Test",print_r($request->getActionName(),1));
+
+        // if no request has been done redirect to Easy
+        if(
+            (Shopware()->Shop()->getTemplate()->getVersion() >= 3) &&
+            ($request->getControllerName() == 'checkout') &&
+            ($request->getActionName() == 'saveShippingPayment') &&
+            (strtolower($user['additional']['payment']['name']) == 'hgw_hpr')
+            &&( Shopware()->Session()->HPdidRequest == "")
+            &&($responseHpr['CRITERION_CONFIG_OPTINFIELD'] == 'TRUE')
+        ){
+mail("sascha.pflueger@heidelpay.de","Case1",print_r($responseHpr,1));
+            return $args->getSubject()->redirect($responseHpr['FRONTEND_REDIRECT_URL']);
+        }
+        // if nor request has been done
+        elseif (
+            (Shopware()->Shop()->getTemplate()->getVersion() >= 3) &&
+            ($request->getControllerName() == 'checkout') &&
+            ($request->getActionName() == 'saveShippingPayment') &&
+            (strtolower($user['additional']['payment']['name']) == 'hgw_hpr')
+            &&( Shopware()->Session()->HPdidRequest == "")
+            &&($responseHpr['CRITERION_CONFIG_OPTINFIELD'] != 'TRUE')
+        ){
+mail("sascha.pflueger@heidelpay.de","Case2",print_r($responseHpr,1));
+            return $args->getSubject()->redirect(array(
+                'forceSecure' => 1,
+                'controller' => 'checkout',
+                'action' => 'shippingPayment',
+            ));
+        }
+        // if a request has been done redirect to checkot confirm
+        elseif (
+            (Shopware()->Shop()->getTemplate()->getVersion() >= 3) &&
+            ($request->getControllerName() == 'checkout') &&
+            ($request->getActionName() == 'confirm') &&
+            (strtolower($user['additional']['payment']['name']) == 'hgw_hpr')
+            &&( Shopware()->Session()->HPdidRequest == "TRUE")
+            &&($responseHpr['CRITERION_CONFIG_OPTINFIELD'] != 'TRUE')
+        ){
+mail("sascha.pflueger@heidelpay.de","Case3",print_r($responseHpr['CRITERION_CONFIG_OPTINFIELD'],1));
+            return $args->getSubject()->redirect(array(
+                'forceSecure' => 1,
+                'controller' => 'checkout',
+                'action' => 'shippingPayment',
+            ));
+        }
+        elseif (
+            (Shopware()->Shop()->getTemplate()->getVersion() >= 3) &&
             ($request->getControllerName() == 'checkout') &&
             ($request->getActionName() == 'shippingPayment') &&
-            (strtolower($user['additional']['payment']['name']) == 'hgw_ivpd')
-        )
-        {
+            (strtolower($user['additional']['payment']['name']) == 'hgw_hpr')
+            &&( Shopware()->Session()->HPdidRequest == "TRUE")
+            &&($responseHpr['CRITERION_CONFIG_OPTINFIELD'] == 'TRUE')
+        ){
+mail("sascha.pflueger@heidelpay.de","Case4",print_r("",1));
+            return $args->getSubject()->redirect(array(
+                'forceSecure' => 1,
+                'controller' => 'checkout',
+                'action' => 'confirm',
+            ));
         }
-        //after chosen HPR redirect to EasyCredit
-        if (
-            //case for Responsive template
-            (
-                ($request->getActionName() == 'saveShippingPayment') &&
-                ($request->getControllerName() == 'checkout') &&
-                (strtolower($user['additional']['payment']['name']) == 'hgw_hpr') &&
-                ((Shopware()->Session()->HPdidRequest == 'FALSE') || empty(Shopware()->Session()->HPdidRequest))
-            ) ||
-            //case for Emotion template
-            (
-                ($request->getActionName() == 'confirm') &&
-                ( $request->getControllerName() == 'checkout')
-                && (strtolower($user['additional']['payment']['name']) == 'hgw_hpr')
-                && ((Shopware()->Session()->HPdidRequest == 'FALSE') || empty(Shopware()->Session()->HPdidRequest))
-            )
-        )
-        {
-            // redirect to EasyCredit
-            if(Shopware()->Shop()->getTemplate()->getVersion() < 3){
-                if (Shopware()->Session()->wantEasy) {
-                    return $args->getSubject()->redirect($responseHpr['FRONTEND_REDIRECT_URL']);
-                } else {
-                    return $args->getSubject()->redirect(array(
-                        'forceSecure' => 1,
-                        'controller' => 'account',
-                        'action' => 'payment',
-                        'sTarget' => 'checkout'
-                    ));
-                }
-                exit();
-            }else{
-
-                if (Shopware()->Session()->wantEasy) {
-                    if ($responseHpr['FRONTEND_REDIRECT_URL']) {
-                        Shopware()->Session()->HPdidRequest = 'TRUE';
-                        return $args->getSubject()->redirect($responseHpr['FRONTEND_REDIRECT_URL']);
-                        exit();
-                    }
-                } else {
-                    Shopware()->Session()->wantEasy = true;
-                    return $args->getSubject()->redirect(array(
-                        'forceSecure' => 1,
-                        'controller' => 'checkout',
-                        'action' => 'shippingPayment',
-                        'sTarget' => 'checkout'
-                    ));
-                }
-            }
-        }
+//
+//        //after chosen HPR redirect to EasyCredit
+//        if (
+//            //case for Responsive template
+//            (
+//                (Shopware()->Shop()->getTemplate()->getVersion() >= 3) &&
+//                ($request->getActionName() == 'saveShippingPayment') &&
+//                ($request->getControllerName() == 'checkout') &&
+//                (strtolower($user['additional']['payment']['name']) == 'hgw_hpr')
+//                &&($responseHpr['CRITERION_CONFIG_OPTINFIELD'] == 'TRUE')
+////                ($request->getActionName() == 'confirm') &&
+////                ($request->getControllerName() == 'checkout') &&
+////                (strtolower($user['additional']['payment']['name']) == 'hgw_hpr')
+////                &&($responseHpr['CRITERION_CONFIG_OPTINFIELD'] == 'TRUE')
+//            ) ||
+//            //case for Emotion template
+//            (
+//                (Shopware()->Shop()->getTemplate()->getVersion() > 3) &&
+//                ($request->getActionName() == 'confirm') &&
+//                ( $request->getControllerName() == 'checkout')
+//                && (strtolower($user['additional']['payment']['name']) == 'hgw_hpr')
+//                &&($responseHpr['CRITERION_CONFIG_OPTINFIELD'] == 'TRUE')
+//            )
+//        )
+//        {
+//mail("sascha.pflueger@heidelpay.de","Checkout Confirm 2499 Session",print_r($_SESSION,1));
+//            // redirect to EasyCredit
+//            if(Shopware()->Shop()->getTemplate()->getVersion() < 3){
+////                if (Shopware()->Session()->wantEasy) {
+//                if ($responseHpr['FRONTEND_REDIRECT_URL']) {
+//                    return $args->getSubject()->redirect($responseHpr['FRONTEND_REDIRECT_URL']);
+//                } else {
+//                    return $args->getSubject()->redirect(array(
+//                        'forceSecure' => 1,
+//                        'controller' => 'account',
+//                        'action' => 'payment',
+//                        'sTarget' => 'checkout'
+//                    ));
+//                }
+//                exit();
+//            }else{
+//mail("sascha.pflueger@heidelpay.de","2500",print_r($responseHpr,1));
+//                if (
+//                    $responseHpr['CONFIG_OPTIN_TEXT']
+//                    && $responseHpr['FRONTEND_REDIRECT_URL']
+//                    && $responseHpr['CRITERION_CONFIG_OPTINFIELD'] == 'TRUE'
+//                    && Shopware()->Session()->HPdidRequest == ""
+//                ) {
+//mail("sascha.pflueger@heidelpay.de","case 1",print_r($responseHpr,1));
+//                    return $args->getSubject()->redirect($responseHpr['FRONTEND_REDIRECT_URL']);
+////                    return $args->getSubject()->redirect(array(
+////                        'forceSecure' => 1,
+////                        'controller' => 'checkout',
+////                        'action' => 'confirm',
+////                    ));
+//                } elseif (
+//                    $responseHpr['CONFIG_OPTIN_TEXT']
+//                    && $responseHpr['FRONTEND_REDIRECT_URL']
+//                    && $responseHpr['CRITERION_CONFIG_OPTINFIELD'] == 'TRUE'
+//                    && Shopware()->Session()->HPdidRequest == "TRUE"
+//                ){
+//                    mail("sascha.pflueger@heidelpay.de","case 2",print_r($responseHpr,1));
+//                    return $args->getSubject()->redirect(array(
+//                        'forceSecure' => 1,
+//                        'controller' => 'checkout',
+//                        'action' => 'confirm',
+//                    ));
+//                } elseif(
+//                    $responseHpr['CONFIG_OPTIN_TEXT']
+//                    && $responseHpr['FRONTEND_REDIRECT_URL']
+//                    && $responseHpr['CRITERION_CONFIG_OPTINFIELD'] == ''
+//                ) {
+//mail("sascha.pflueger@heidelpay.de","case 3",print_r($responseHpr,1));
+//                    return $args->getSubject()->redirect(array(
+//                        'forceSecure' => 1,
+//                        'controller' => 'checkout',
+//                        'action' => 'shippingPayment',
+//                        'sTarget' => 'checkout'
+//                    ));
+//                }
+//            }
+//        }
 
         // expand template "checkout_confirm" and show hire purchase rates
         if (
             ($request->getControllerName() == 'checkout') &&
             ($request->getActionName() == 'confirm') &&
-            (strtolower($user['additional']['payment']['name']) == 'hgw_hpr') &&
-            (Shopware()->Session()->HPdidRequest == 'TRUE')
+            (strtolower($user['additional']['payment']['name']) == 'hgw_hpr')
+            && ($responseHpr['CRITERION_CONFIG_OPTINFIELD'] == 'TRUE')
+            && ($responseHpr['FRONTEND_REDIRECT_URL'])
         ) {
             if (
                 !empty(Shopware()->Session()->sessionId)
             ){
                 // fetching transaction of INI from Db
                 $transaction = self::getHgwTransactions(Shopware()->Session()->sessionId);
+mail("sascha.pflueger@heidelpay.de","Bootstrap 2544 Checkout/conf",print_r($transaction,1));
                 if ($transaction) {
                     $parameters = json_decode($transaction['jsonresponse']);
                     /* check if submitted address is same as deliveryaddress
                      * and if amount sent is same as amount in basket
                      */
                     if (
-                        $parameters->ADDRESS_STREET 	!= $user['shippingaddress']['street']
-                        ||	$parameters->ADDRESS_CITY	 	!= $user['shippingaddress']['city']
-                        ||	$parameters->ADDRESS_ZIP	 	!= $user['shippingaddress']['zipcode']
+//                        $parameters->ADDRESS_STREET 	    != $user['shippingaddress']['street']
+//                        ||	$parameters->ADDRESS_CITY	 	!= $user['shippingaddress']['city']
+//                        ||	$parameters->ADDRESS_ZIP	 	!= $user['shippingaddress']['zipcode']
+                        $parameters->ADDRESS_STREET 	    != $user['billingaddress']['street']
+                        ||	$parameters->ADDRESS_CITY	 	!= $user['billingaddress']['city']
+                        ||	$parameters->ADDRESS_ZIP	 	!= $user['billingaddress']['zipcode']
                         ||	$parameters->PRESENTATION_AMOUNT!= $basketAmount+$shippingAmount
                     )
                     {
@@ -2581,8 +2684,8 @@ class Shopware_Plugins_Frontend_HeidelGateway_Bootstrap extends Shopware_Compone
                         //expand template
                         $view->configOptInText = $optinText;
 
-                        Shopware()->Session()->wantEasy = TRUE;
-                        Shopware()->Session()->HPdidRequest = 'TRUE';
+//                        Shopware()->Session()->wantEasy = TRUE;
+//                        Shopware()->Session()->HPdidRequest = 'TRUE';
                         $view->activeEasy = "TRUE";
                         $view->easyAmount = $basketAmount+$shippingAmount;
                         $view->HGW_EASYMINAMOUNT = Shopware()->Plugins()->Frontend()->HeidelGateway()->Config()->HGW_EASYMINAMOUNT;
@@ -2596,9 +2699,9 @@ class Shopware_Plugins_Frontend_HeidelGateway_Bootstrap extends Shopware_Compone
                         $view->extendsTemplate('register/hp_payment_hpr.tpl');
 
                         // redirect to EasyCredit
-                        if (!empty($responseHpr['FRONTEND_REDIRECT_URL'])) {
-                            Shopware()->Session()->HPdidRequest = 'TRUE';
-                        }
+//                        if (!empty($responseHpr['FRONTEND_REDIRECT_URL'])) {
+//                            Shopware()->Session()->HPdidRequest = 'TRUE';
+//                        }
                     }
 
                     // setting texts for template
@@ -2626,8 +2729,8 @@ class Shopware_Plugins_Frontend_HeidelGateway_Bootstrap extends Shopware_Compone
         if (
             ($request->getControllerName() == 'checkout') &&
             ($request->getActionName() == 'confirm') &&
-            (strtolower($user['additional']['payment']['name']) == 'hgw_hpr') &&
-            (Shopware()->Session()->HPdidRequest == FALSE )
+            (strtolower($user['additional']['payment']['name']) == 'hgw_hpr')
+//            && (Shopware()->Session()->HPdidRequest == FALSE )
         )
         {
             if(Shopware()->Shop()->getTemplate()->getVersion() < 3){
@@ -2668,7 +2771,7 @@ class Shopware_Plugins_Frontend_HeidelGateway_Bootstrap extends Shopware_Compone
         {
             // redirect to EasyCredit
             if (!empty($responseHpr['FRONTEND_REDIRECT_URL'])) {
-                Shopware()->Session()->HPdidRequest = 'TRUE';
+//                Shopware()->Session()->HPdidRequest = 'TRUE';
                 return $args->getSubject()->redirect($responseHpr['FRONTEND_REDIRECT_URL']);
             }
         }
@@ -2743,7 +2846,7 @@ class Shopware_Plugins_Frontend_HeidelGateway_Bootstrap extends Shopware_Compone
                 )
                 {
                     if (!empty($responseHpr['FRONTEND_REDIRECT_URL'])) {
-                        Shopware()->Session()->HPdidRequest = 'TRUE';
+//                        Shopware()->Session()->HPdidRequest = 'TRUE';
                         return $args->getSubject()->redirect($responseHpr['FRONTEND_REDIRECT_URL']);
                     }
                 }

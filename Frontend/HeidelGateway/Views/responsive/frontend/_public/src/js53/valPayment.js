@@ -210,9 +210,11 @@ document.asyncReady(function () {
                 }
 
                 if(pm.indexOf("hgw_dd") != -1){
-                    var errorsDD = new Array();
+                    var errorsDD = new Array();console.log("216");
                     //validation of Iban
-                    var errorsDD = valInputDdIban(jQuery('.newreg_dd #iban').val(), pm);
+                    if(jQuery('.newreg_dd #iban').is(":visible")){
+                        var errorsDD = valInputDdIban(jQuery('.newreg_dd #iban').val(), pm);
+                    }
 
                     // direct debit secured
                     if(jQuery('.newreg_dd #salutation').is(':visible')){
@@ -241,6 +243,8 @@ document.asyncReady(function () {
                         return false;
                     }
                 }
+
+
             } else {
                 // case for other payment methods than heidelpay's on account/payment
                 $('#hgw_privpol_ivpd').removeAttr("required");
@@ -307,6 +311,16 @@ document.asyncReady(function () {
                             $(".newreg_ivpd .js--fancy-select").attr('disabled', 'disabled');
                             $(".newreg_ivpd .hgw_val_ivpd").attr('disabled', 'disabled');
                             $(".newreg_ivpd #birthdate_ivpd").attr('disabled', 'disabled');
+                        }
+
+                        if(pm == 'hpr'){
+                            console.log("Treffer 315");
+                            var errors = valEasyCredit();
+                            console.log(errors);
+                            if(errors.length > 0){
+                                return false
+                            }
+
                         }
                     }
                 }
@@ -550,7 +564,7 @@ function valForm() {
                         });
                         if (pm == 'dd') {
                             var errors = new Array();
-
+console.log("565");
                             // direct debit
                             var errors = valInputDdIban(jQuery('.newreg_' + pm + ' #iban').val(), pm);
 
@@ -589,6 +603,14 @@ function valForm() {
                             var age = Math.floor((today - dob) / (365.25 * 24 * 60 * 60 * 1000));
                             var errors = valBirthdate(age);
                         }
+
+                        if(pm == 'hpr'){
+                            var errors = valEasyCredit();
+                            if(errors.length > 0){
+                                return false
+                            }
+                        }
+
                     }
                 } else {
                     checkedOpt = checkedOpt.replace('radio', '').trim();
@@ -649,6 +671,7 @@ function valGatewayForm() {
     });
     if (pm == 'dd') {
         var errors = new Array();
+console.log("672");
         // direct debit
         errors = valInputDdIban(jQuery('.' + checkedOpt + '  #iban').val(), pm);
 
@@ -664,6 +687,7 @@ function valGatewayForm() {
             errors = valDirectDebitSecured(errors);
         }
     } else if (pm == 'gir') {
+        console.log("688");
         var errors = valInputDdIban(jQuery('.' + checkedOpt + '  #iban').val(), pm);
     } else if (pm == "papg"){
         var errorsPapg = valInvoiceSec();
@@ -685,6 +709,12 @@ function valGatewayForm() {
         } else {
             jQuery('#payment .alert .is--error .is--rounded div').remove();
         }
+    } else if(pm == 'hpr') {
+         console.log("Treffer 698");
+         var errors = valEasyCredit();
+         if(errors.length > 0) {
+             return false
+         }
     }
 
     if ((jQuery('.' + checkedOpt + '  .has--error').length > 0)) {
@@ -721,6 +751,7 @@ function valShippingPaymentForm() {
 
             if (pm == 'dd') {
                 var errors = new Array();
+console.log("752");
                 // direct debit
                 errors = valInputDdIban(jQuery('.' + checkedOpt + '  #iban').val(), pm);
 
@@ -758,6 +789,14 @@ function valShippingPaymentForm() {
                 if(errors.length >0)
                 {
                     return false;
+                }
+            }
+
+            if(pm == 'hpr'){
+                console.log("Treffer");
+                var errors = valEasyCredit();
+                if(errors.length > 0){
+                    return false
                 }
             }
 
@@ -1100,7 +1139,16 @@ function valInvoiceSec() {
     }
 }
 
-
+function valEasyCredit() {
+    console.log("valEasy Func");
+    var errors = {};
+    var i = 0;
+    if(!(jQuery("#hgw_cb_hpr").is(":checked"))){
+        errors[i++] = 'msg_cb';
+    }
+    console.log(errors);
+    return errors;
+}
 /**
  * valPhoneNumber
  * in case of valid Number this functins returns a cleaned telephonenumber in format 004912345678
